@@ -33,7 +33,8 @@ $FSLogixURI              = 'https://go.microsoft.com/fwlink/?linkid=2084562'
 $FSInstaller             = 'FSLogixAppsSetup.zip'
 $WVDAgentInstaller       = 'WVD-Agent.msi'
 $WVDBootInstaller        = 'WVD-Bootloader.msi'
-
+$CatoCertURI             = 'https://automate.compassmsp.com/softwarepackages/CatoNetworksTrustedRootCA.cer'
+$CatoCert                = 'CatoNetworksTrustedRootCA.cer'
 
 
 ####################################
@@ -60,6 +61,13 @@ else {
 Invoke-WebRequest -Uri $WVDBootURI -OutFile "$Localpath$WVDBootInstaller"
 Invoke-WebRequest -Uri $WVDAgentURI -OutFile "$Localpath$WVDAgentInstaller"
 Invoke-WebRequest -Uri $FSLogixURI -OutFile "$Localpath$FSInstaller"
+Invoke-WebRequest -Uri $CatoCertURI -OutFile "$Localpath$CatoCert"
+
+
+###########################
+#    Install Cato Cert    #
+###########################
+Import-Certificate -FilePath "$Localpath$CatoCert" -CertStoreLocation Cert:\LocalMachine\Root
 
 
 ##############################
@@ -135,34 +143,9 @@ New-ItemProperty `
     -Value 1
 New-ItemProperty `
     -Path HKLM:\SOFTWARE\FSLogix\Profiles `
-    -Name "DeleteLocalProfileWhenVHDShouldApply" `
-    -PropertyType "DWord" `
-    -Value 1
-New-ItemProperty `
-    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
-    -Name "FlipFlopProfileDirectoryName" `
-    -PropertyType "DWord" `
-    -Value 1
-New-ItemProperty `
-    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
-    -Name "PreventLoginWithFailure" `
-    -PropertyType "DWord" `
-    -Value 1
-New-ItemProperty `
-    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
-    -Name "PreventLoginWithTempProfile" `
-    -PropertyType "DWord" `
-    -Value 1
-New-ItemProperty `
-    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
-    -Name "RebootOnUserLogoff" `
-    -PropertyType "DWord" `
-    -Value 0
-New-ItemProperty `
-    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
-    -Name "ShutdownOnUserLogoff" `
-    -PropertyType "DWord" `
-    -Value 0
+    -Name "VolumeType" `
+    -PropertyType "String" `
+    -Value "vhdx"    
 Pop-Location
 
 
@@ -192,24 +175,9 @@ New-ItemProperty `
     -Value 1
 New-ItemProperty `
     -Path .\FSLogix\ODFC `
-    -Name "DeleteLocalProfileWhenVHDShouldApply" `
+    -Name "IncludeOfficeActivation" `
     -PropertyType "DWord" `
-    -Value 1
-New-ItemProperty `
-    -Path .\FSLogix\ODFC `
-    -Name "FlipFlopProfileDirectoryName" `
-    -PropertyType "DWord" `
-    -Value 0
-New-ItemProperty `
-    -Path .\FSLogix\ODFC `
-    -Name "PreventLoginWithFailure" `
-    -PropertyType "DWord" `
-    -Value 0
-New-ItemProperty `
-    -Path .\FSLogix\ODFC `
-    -Name "PreventLoginWithTempProfile" `
-    -PropertyType "DWord" `
-    -Value 0
+    -Value 1    
 New-ItemProperty `
     -Path .\FSLogix\ODFC `
     -Name "IncludeOneDrive" `
@@ -263,10 +231,6 @@ New-ItemProperty `
     -Value 1
 
 
-
-#############
-#    END    #
-#############
 
 
 
