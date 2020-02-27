@@ -230,6 +230,11 @@ New-ItemProperty `
     -PropertyType "DWORD" `
     -Value 1
 
+ Copy-Item "C:\Program Files (x86)\Microsoft OneDrive\*\adm\OneDrive.adml" -Destination "C:\Windows\PolicyDefinitions\en-US"
+ Copy-Item "C:\Program Files (x86)\Microsoft OneDrive\*\adm\OneDrive.admx" -Destination "C:\Windows\PolicyDefinitions"
+
+
+
 
 
 
