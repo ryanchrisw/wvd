@@ -226,8 +226,8 @@ Pop-Location
 
 New-ItemProperty `
     -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" `
-    -Name fEnableTimeZoneRedirection `
-    -PropertyType DWORD `
+    -Name "fEnableTimeZoneRedirection" `
+    -PropertyType "DWORD" `
     -Value 1
 
 
