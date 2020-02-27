@@ -135,7 +135,7 @@ New-ItemProperty `
     -Path HKLM:\SOFTWARE\FSLogix\Profiles `
     -Name "CCDLocations" `
     -PropertyType "MultiString" `
-    -Value "type=azure,connectionString=$CCDLocation"
+    -Value "type=azure,connectionString=""$CCDLocation"""
 New-ItemProperty `
     -Path HKLM:\SOFTWARE\FSLogix\Profiles `
     -Name "Enabled" `
@@ -167,7 +167,7 @@ New-ItemProperty `
     -Path .\FSLogix\ODFC `
     -Name "CCDLocations" `
     -PropertyType "MultiString" `
-    -Value "type=azure,connectionString=$CCDLocation"
+    -Value "type=azure,connectionString=""$CCDLocation"""
 New-ItemProperty `
     -Path .\FSLogix\ODFC `
     -Name "Enabled" `
