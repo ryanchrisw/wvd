@@ -19,13 +19,15 @@ Param (
     [Parameter(Mandatory=$true)]
         [string]$CCDLocation,
     [Parameter(Mandatory=$true)]
+        [string]$AadTenantId,
+    [Parameter(Mandatory=$true)]
         [string]$RegistrationToken
 )
 
 
-######################
-#    WVD Variables   #
-######################
+##################
+#    Variables   #
+##################
 $Localpath               = "c:\temp\wvd\"
 $WVDBootURI              = 'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrxrH'
 $WVDAgentURI             = 'https://query.prod.cms.rt.microsoft.com/cms/api/am/binary/RWrmXv'
@@ -35,6 +37,7 @@ $WVDAgentInstaller       = 'WVD-Agent.msi'
 $WVDBootInstaller        = 'WVD-Bootloader.msi'
 $CatoCertURI             = 'https://automate.compassmsp.com/softwarepackages/CatoNetworksTrustedRootCA.cer'
 $CatoCert                = 'CatoNetworksTrustedRootCA.cer'
+
 
 
 ####################################
@@ -79,7 +82,7 @@ Expand-Archive `
     -Force `
     -Verbose
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-cd $Localpath
+Set-Location $Localpath
 
 
 ################################
@@ -131,11 +134,16 @@ New-Item `
     -Name Profiles `
     -Value "" `
     -Force
-New-ItemProperty `
+    New-ItemProperty `
     -Path HKLM:\SOFTWARE\FSLogix\Profiles `
     -Name "CCDLocations" `
     -PropertyType "MultiString" `
     -Value "type=azure,connectionString=""$CCDLocation"""
+    New-ItemProperty `
+    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
+    -Name "VolumeType" `
+    -PropertyType "MultiString" `
+    -Value "vhdx"    
 New-ItemProperty `
     -Path HKLM:\SOFTWARE\FSLogix\Profiles `
     -Name "Enabled" `
@@ -143,9 +151,34 @@ New-ItemProperty `
     -Value 1
 New-ItemProperty `
     -Path HKLM:\SOFTWARE\FSLogix\Profiles `
-    -Name "VolumeType" `
-    -PropertyType "String" `
-    -Value "vhdx"    
+    -Name "DeleteLocalProfileWhenVHDShouldApply" `
+    -PropertyType "DWord" `
+    -Value 0
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
+    -Name "FlipFlopProfileDirectoryName" `
+    -PropertyType "DWord" `
+    -Value 1
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
+    -Name "PreventLoginWithFailure" `
+    -PropertyType "DWord" `
+    -Value 1
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
+    -Name "PreventLoginWithTempProfile" `
+    -PropertyType "DWord" `
+    -Value 1
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
+    -Name "RebootOnUserLogoff" `
+    -PropertyType "DWord" `
+    -Value 0
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\FSLogix\Profiles `
+    -Name "ShutdownOnUserLogoff" `
+    -PropertyType "DWord" `
+    -Value 0
 Pop-Location
 
 
@@ -168,16 +201,31 @@ New-ItemProperty `
     -Name "CCDLocations" `
     -PropertyType "MultiString" `
     -Value "type=azure,connectionString=""$CCDLocation"""
+    New-ItemProperty `
+    -Path .\FSLogix\ODFC `
+    -Name "VolumeType" `
+    -PropertyType "MultiString" `
+    -Value "vhdx"
 New-ItemProperty `
     -Path .\FSLogix\ODFC `
-    -Name "Enabled" `
+    -Name "DeleteLocalProfileWhenVHDShouldApply" `
+    -PropertyType "DWord" `
+    -Value 0
+New-ItemProperty `
+    -Path .\FSLogix\ODFC `
+    -Name "FlipFlopProfileDirectoryName" `
     -PropertyType "DWord" `
     -Value 1
 New-ItemProperty `
     -Path .\FSLogix\ODFC `
-    -Name "IncludeOfficeActivation" `
+    -Name "PreventLoginWithFailure" `
     -PropertyType "DWord" `
-    -Value 1    
+    -Value 1
+New-ItemProperty `
+    -Path .\FSLogix\ODFC `
+    -Name "PreventLoginWithTempProfile" `
+    -PropertyType "DWord" `
+    -Value 1
 New-ItemProperty `
     -Path .\FSLogix\ODFC `
     -Name "IncludeOneDrive" `
@@ -227,16 +275,52 @@ Pop-Location
 New-ItemProperty `
     -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services" `
     -Name "fEnableTimeZoneRedirection" `
-    -PropertyType "DWORD" `
+    -PropertyType "DWord" `
     -Value 1
 
  Copy-Item "C:\Program Files (x86)\Microsoft OneDrive\*\adm\OneDrive.adml" -Destination "C:\Windows\PolicyDefinitions\en-US"
  Copy-Item "C:\Program Files (x86)\Microsoft OneDrive\*\adm\OneDrive.admx" -Destination "C:\Windows\PolicyDefinitions"
 
+ New-ItemProperty `
+     -Path HKLM:\SOFTWARE\Policies\Microsoft\OneDrive `
+     -Name "DehydrateSyncedTeamSites" `
+     -PropertyType "DWord" `
+     -Value 1
 
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\Policies\Microsoft\OneDrive `
+    -Name "FilesOnDemandEnabled" `
+    -PropertyType "DWord" `
+    -Value 1
 
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\Policies\Microsoft\OneDrive `
+    -Name "KFMSilentOptIn" `
+    -PropertyType "String" `
+    -Value "$AadTenantId"
 
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\Policies\Microsoft\OneDrive `
+    -Name "KFMSilentOptInWithNotification" `
+    -PropertyType "DWord" `
+    -Value 1
 
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\Policies\Microsoft\OneDrive `
+    -Name "SilentAccountConfig" `
+    -PropertyType "DWord" `
+    -Value 1
 
+New-ItemProperty `
+    -Path HKLM:\SOFTWARE\Policies\Microsoft\OneDrive `
+    -Name "ForcedLocalMassDeleteDetection" `
+    -PropertyType "DWord" `
+    -Value 1
 
+#New-ItemProperty `
+#    -Path "HKLM:\SOFTWARE\Microsoft\Teams" `
+#    -Name "IsWVDEnvironment" `
+#    -PropertyType "DWord" `
+#    -Value 1
 
+#msiexec /i <msi_name> /l*v < install_logfile_name> ALLUSER=1
