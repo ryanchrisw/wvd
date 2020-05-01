@@ -35,7 +35,7 @@ $FSLogixURI              = 'https://go.microsoft.com/fwlink/?linkid=2084562'
 $FSInstaller             = 'FSLogixAppsSetup.zip'
 $WVDAgentInstaller       = 'WVD-Agent.msi'
 $WVDBootInstaller        = 'WVD-Bootloader.msi'
-$CatoCertURI             = 'https://automate.compassmsp.com/softwarepackages/CatoNetworksTrustedRootCA.cer'
+$CatoCertURI             = 'https://rmm.compassmsp.com/softwarepackages/CatoNetworksTrustedRootCA.cer'
 $CatoCert                = 'CatoNetworksTrustedRootCA.cer'
 
 
